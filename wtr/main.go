@@ -24,11 +24,13 @@ type Cur struct {
     Time string `json:"time"`
     Humid int `json:"relative_humidity_2m"`
     Interv int `json:"interval"`
+    Wind float64 `json:"wind_speed_10m"`
+    Code int `json:"weather_code"`
 
 }
 
 type Units struct {
-    Temp string `json:"time"`
+    Temp string `json:"temperature_2m"`
     Humid string `json:"relative_himidity_2m"`
     Wind string `json:"wind_speed_10m"`
     Code string `json:"weather_code:"`
@@ -39,6 +41,34 @@ type Weather struct {
     Units Units `json:"current_units"`
 }
 
+func wtrdisc(code int) string {
+    switch code {
+    case 0:
+        return "Clear sky"
+    case 1:
+        return "Mainly clear"
+    case 2:
+        return "Partly cloudy"
+    case 3:
+        return "Overcast"
+    case 45, 48:
+        return "Fog"
+    case 51, 53, 55, 56, 57:
+        return "Drizzle"
+    case 61, 63, 65, 66, 67:
+        return "Rain"
+    case 71, 73, 75, 77:
+        return "Snow"
+    case 80, 81, 82:
+        return "Rain showers"
+    case 85, 86:
+        return "Snow showers"
+    case 95, 96, 99:
+        return "Thunderstorm"
+    default:
+        return "Unknown"
+    }
+}
 
 func read() {
     wget("https://api.open-meteo.com/v1/forecast?latitude=39.1582&longitude=-75.5244&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code")
@@ -73,11 +103,14 @@ func read() {
 func main() {
     read()
     fmt.Printf("Humidity: ")
-    fmt.Println(weather.Cur.Humid, weather.Units.Humid)
-    fmt.Printf("Weather code: ")
+    fmt.Println(weather.Cur.Humid, weather.Units.Humid,"%")
+    fmt.Printf("Temp: ")
     fmt.Println(weather.Cur.Temp, weather.Units.Temp)
     fmt.Printf("Time: ")
     fmt.Println(weather.Cur.Time)
-    fmt.Printf("Interval:  ")
+    fmt.Printf("Interval: ")
     fmt.Println(weather.Cur.Interv)
+    fmt.Printf("Wind SPD: ")
+    fmt.Println(weather.Cur.Wind, weather.Units.Wind)
+    fmt.Println(wtrdisc(weather.Cur.Code))
 }
